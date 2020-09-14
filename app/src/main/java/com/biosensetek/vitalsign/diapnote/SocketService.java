@@ -1,3 +1,28 @@
+package com.biosensetek.vitalsign.diapnote;
+
+import android.app.Service;
+import android.content.Intent;
+import android.os.Binder;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Looper;
+import android.util.Log;
+import android.widget.TabHost;
+import android.widget.Toast;
+
+import com.biosensetek.vitalsign.diapnote.Constants;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.net.ConnectException;
+import java.net.InetSocketAddress;
+import java.net.NoRouteToHostException;
+import java.net.Socket;
+import java.net.SocketTimeoutException;
+import java.util.Timer;
+import java.util.TimerTask;
+
+
 public class SocketService extends Service {
 
     /*socket*/
@@ -30,26 +55,31 @@ public class SocketService extends Service {
     public void onCreate() {
         super.onCreate();
 
-
+        Log.i("WifiWake", "onCreate SocketService");
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
+        Log.i("WifiWake", "onStartCommand");
         /*拿到傳遞過來的ip和埠號*/
+        /*
         ip = intent.getStringExtra(Constants.INTENT_IP);
         port = intent.getStringExtra(Constants.INTENT_PORT);
+        */
+        ip = "10.0.2.2";
+        port = "4005";
         /*初始化socket*/
         initSocket();
         return super.onStartCommand(intent, flags, startId);
     }
     /*初始化socket*/
     private void initSocket() {
+        Log.i("WifiWake", "initSocket");
         if (socket == null && connectThread == null) {
             connectThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
-
+                    Log.i("WifiWake", "initsocket");
                     socket = new Socket();
                     try {
                         /*超時時間為2秒*/
@@ -60,9 +90,11 @@ public class SocketService extends Service {
                             /*因為Toast是要執行在主執行緒的  這裡是子執行緒  所以需要到主執行緒哪裡去顯示toast*/
                             toastMsg("socket已連線");
                             /*傳送連線成功的訊息*/
+                            /*
                             EventMsg msg = new EventMsg();
                             msg.setTag(Constants.CONNET_SUCCESS);
                             EventBus.getDefault().post(msg);
+                            */
                             /*傳送心跳資料*/
                             sendBeatData();
                         }
